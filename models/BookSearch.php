@@ -37,7 +37,7 @@ class BookSearch extends Book
      *
      * @param array $params
      *
-     * @return ActiveDataProvider
+     * @return \yii\db\ActiveQuery
      */
     public function search($params)
     {
@@ -45,17 +45,17 @@ class BookSearch extends Book
 
         // add conditions that should always apply here
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+//        $dataProvider = new ActiveDataProvider([
+//            'query' => $query,
+//        ]);
 
         $this->load($params);
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
+//        if (!$this->validate()) {
+//            // uncomment the following line if you do not want to return any records when validation fails
+//            // $query->where('0=1');
+//            return $dataProvider;
+//        }
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -66,6 +66,6 @@ class BookSearch extends Book
             ->andFilterWhere(['like', 'book_author', $this->book_author])
             ->andFilterWhere(['like', 'book_desc', $this->book_desc]);
 
-        return $dataProvider;
+        return $query;
     }
 }

@@ -5,6 +5,7 @@ namespace app\controllers;
 use Yii;
 use app\models\Book;
 use app\models\BookSearch;
+use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -14,6 +15,8 @@ use yii\filters\VerbFilter;
  */
 class BookController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     /**
      * @inheritdoc
      */
@@ -36,12 +39,25 @@ class BookController extends Controller
     public function actionIndex()
     {
         $searchModel = new BookSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataQuery = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+//        $count = $dataQuery->count();
+//        $pagination = new Pagination([
+//            'defaultPageSize' => 10,
+//            'totalCount' => $count,
+//        ]);
+
+        $data = $dataQuery->all();
+
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        return [
+            'code' => 0,
+            'msg' => 'success',
+            'data' => [
+                'list' => $data,
+            ]
+        ];
     }
 
     /**
@@ -52,9 +68,13 @@ class BookController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        return [
+            'code' => 0,
+            'msg' => 'success',
+            'data' => $this->findModel($id)
+        ];
     }
 
     /**
@@ -66,13 +86,23 @@ class BookController extends Controller
     {
         $model = new Book();
 
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->book_id]);
+            return [
+                'code' => 0,
+                'msg' => 'success',
+                'data' => [
+                    'id' => $model->book_id
+                ]
+            ];
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return [
+            'code' => -1,
+            'msg' => 'error',
+        ];
     }
 
     /**
@@ -86,13 +116,23 @@ class BookController extends Controller
     {
         $model = $this->findModel($id);
 
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->book_id]);
+            return [
+                'code' => 0,
+                'msg' => 'success',
+                'data' => [
+                    'id' => $model->book_id
+                ]
+            ];
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        return [
+            'code' => -1,
+            'msg' => 'error',
+        ];
     }
 
     /**
@@ -106,7 +146,13 @@ class BookController extends Controller
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+
+        return [
+            'code' => 0,
+            'msg' => 'success',
+        ];
     }
 
     /**
